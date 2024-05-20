@@ -45,3 +45,21 @@ class Users_base:
             combined_result = f"{result['year']}/{result['month']}"
             combined_results.append(combined_result)
         return combined_results
+
+    def check_admin(self, id):
+        self.cursor.execute("SELECT admin FROM users WHERE id =?", (id,))
+        results = self.cursor.fetchall()
+        if results:
+            result = results[0][0]
+            if result == "True":
+                return True
+            elif result == "False":
+                return False
+            else:
+                raise ValueError(f"Unexpected value '{result}' in admin column")
+        else:
+            return None
+
+    def new_admin(self, id):
+        self.cursor.execute("UPDATE users SET admin =? WHERE id =?", ('True', id,))
+        self.connect.commit()
