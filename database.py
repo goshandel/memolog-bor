@@ -25,5 +25,5 @@ class Users_base:
 
     def add_user(self, id, user_name, nickname):
         self.cursor.execute("INSERT INTO speak VALUES(?,?,?,?,?,?,?,?);",
-                            (id, user_name, nickname, 0, '', '', False, ''))
+                            (id, user_name, nickname, 0, '', '', 'False', ''))
         self.connect.commit()
