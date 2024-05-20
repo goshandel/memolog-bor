@@ -4,4 +4,3 @@
 # примеры паролей я могу скинуть
 from config import token
 
-bot = telebot.TeleBot(token=token)

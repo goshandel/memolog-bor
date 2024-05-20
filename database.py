@@ -17,13 +17,31 @@ class Users_base:
         self.connect.commit()
 
     def check_user_exists(self, id):
-        self.cursor.execute("""SELECT id FROM speak
+        self.cursor.execute("""SELECT id FROM users
                              WHERE id = ?""",
                             (id,))
         data = self.cursor.fetchone()
         return data is not None
 
     def add_user(self, id, user_name, nickname):
-        self.cursor.execute("INSERT INTO speak VALUES(?,?,?,?,?,?,?,?);",
+        self.cursor.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?,?);",
                             (id, user_name, nickname, 0, '', '', 'False', ''))
         self.connect.commit()
+
+    def add_year(self, id, year):
+        self.cursor.execute("UPDATE users SET year =? WHERE id =?", (year, id))
+        self.connect.commit()
+
+    def add_month(self, id, month):
+        self.cursor.execute("UPDATE users SET month =? WHERE id =?", (month, id))
+        self.connect.commit()
+
+    def get_year_month(self, id):
+        self.cursor.execute("SELECT month, year FROM users WHERE id =?", (id,))
+        results = self.cursor.fetchall()
+        formatted_results = [{"year": row[1], "month": row[0]} for row in results]
+        combined_results = []
+        for result in formatted_results:
+            combined_result = f"{result['year']}/{result['month']}"
+            combined_results.append(combined_result)
+        return combined_results
