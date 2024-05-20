@@ -63,3 +63,6 @@ class Users_base:
     def new_admin(self, id):
         self.cursor.execute("UPDATE users SET admin =? WHERE id =?", ('True', id,))
         self.connect.commit()
+
+    def close(self):
+        self.connect.close()
