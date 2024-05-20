@@ -74,3 +74,13 @@ class Users_base:
 
     def close(self):
         self.connect.close()
+
+
+class Years_base:
+    def __init__(self):
+        self.connect = sqlite3.connect('years.db')
+        self.cursor = self.connect.cursor()
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS years 
+                        (year/month TEXT PRIMARY KEY AUTOINCREMENT,
+                        memes TEXT)""")
+        self.connect.commit()
