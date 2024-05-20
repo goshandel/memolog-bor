@@ -64,5 +64,13 @@ class Users_base:
         self.cursor.execute("UPDATE users SET admin =? WHERE id =?", ('True', id,))
         self.connect.commit()
 
+    def add_meme(self, id, meme):
+        self.cursor.execute("UPDATE users SET meme =? WHERE id =?", (meme, id))
+        self.connect.commit()
+
+    def add_council(self, id, council):
+        self.cursor.execute("UPDATE users SET council =? WHERE id =?", (council, id))
+        self.connect.commit()
+
     def close(self):
         self.connect.close()
