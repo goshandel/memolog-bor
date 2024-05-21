@@ -25,7 +25,7 @@ class Users_base:
 
     def add_user(self, id, user_name, nickname):
         self.cursor.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?,?);",
-                            (id, user_name, nickname, 0, '', '', 'False', ''))
+                            (id, user_name, nickname, None, None, None, 'False', None))
         self.connect.commit()
 
     def add_year(self, id, year):
@@ -72,6 +72,14 @@ class Users_base:
         self.cursor.execute("UPDATE users SET council =? WHERE id =?", (council, id))
         self.connect.commit()
 
+    def get_council(self, id):
+        result = self.cursor.execute("SELECT council FROM users WHERE id =?", (id,))
+        row = result.fetchone()
+        if row is None:
+            return False
+        else:
+            return row[0]
+
     def close(self):
         self.connect.close()
 
@@ -81,6 +89,36 @@ class Years_base:
         self.connect = sqlite3.connect('years.db')
         self.cursor = self.connect.cursor()
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS years 
-                        (year/month TEXT PRIMARY KEY AUTOINCREMENT,
-                        memes TEXT)""")
+                        (year_month TEXT PRIMARY KEY AUTOINCREMENT,
+                        memes TEXT,
+                        edit_meme TEXT)""")
         self.connect.commit()
+
+    def add_new_month(self, year_month):
+        self.cursor.execute("INSERT INTO years VALUES(?,?,?);",
+                            (year_month, None, None))
+        self.connect.commit()
+
+    def add_meme(self, year_month, meme):
+        self.cursor.execute("UPDATE years SET memes = CONCAT(memes,?, '\n') WHERE year_month =?",
+                            (meme, year_month))
+        self.connect.commit()
+
+    def get_edit_meme(self, year_month):
+        result = self.cursor.execute("SELECT edit_meme FROM years WHERE year_month = ?", (year_month))
+        row = result.fetchone()
+        if row is None:
+            return False
+        else:
+            return row[0]
+
+    def add_edit_meme(self, year_month, edit_meme):
+        self.cursor.execute("SELECT edit_meme FROM years WHERE year_month =?", (year_month,))
+        result = self.cursor.fetchone()
+
+        if result is None or result[0] == '':
+            self.cursor.execute("UPDATE years SET edit_meme =? WHERE year_month =?", (edit_meme, year_month))
+            self.connect.commit()
+            return True
+        else:
+            return False
