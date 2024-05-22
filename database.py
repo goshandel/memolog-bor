@@ -72,13 +72,24 @@ class Users_base:
         self.cursor.execute("UPDATE users SET council =? WHERE id =?", (council, id))
         self.connect.commit()
 
-    def get_council(self, id):
-        result = self.cursor.execute("SELECT council FROM users WHERE id =?", (id,))
-        row = result.fetchone()
-        if row is None:
-            return False
+    def update_and_return_council(self):
+        select_query = "SELECT id, council FROM users WHERE council IS NOT NULL LIMIT 1"
+        cursor = self.cursor.execute(select_query)
+        row = cursor.fetchone()
+
+        if row is not None:
+            user_id, current_council = row
+            update_query = "UPDATE users SET council =? WHERE id =?"
+            self.cursor.execute(update_query, (None, user_id))
+            self.connect.commit()
+            return current_council
         else:
-            return row[0]
+            return None
+
+    def get_all_users(self):
+        self.cursor.execute("SELECT * FROM users")
+        results = self.cursor.fetchall()
+        return results
 
     def close(self):
         self.connect.close()
