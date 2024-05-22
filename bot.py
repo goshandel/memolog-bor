@@ -13,4 +13,5 @@ def challenge_to_duel(message):
     base = Users_base()
     if not base.check_user_exists(message.chat.id):
         base.add_user(message.chat.id, message.chat.first_name, message.chat.username)
-    bot.send_message(message.chat.id, "привет")
+    bot.send_message(message.chat.id, "Всё готово и все в сборе! Только <i>тебя</i> не хватает.\n<b>Старичок</b>, идём на пикничок", parse_mode='html')
+bot.infinity_polling()

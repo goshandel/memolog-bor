@@ -133,3 +133,45 @@ class Years_base:
             return True
         else:
             return False
+
+
+class Memes_base:
+    def __init__(self):
+        self.connect = sqlite3.connect('memes.db')
+        self.cursor = self.connect.cursor()
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS memes 
+                        (name TEXT PRIMARY KEY AUTOINCREMENT,
+                        description TEXT,
+                        photo TEXT)""")
+        self.connect.commit()
+
+    def add_new_meme(self, name):
+        self.cursor.execute("INSERT INTO memes VALUES(?,?,?);",
+                            (name, None, None))
+        self.connect.commit()
+
+    def add_description(self, description, name):
+        self.cursor.execute("UPDATE memes SET description = ? WHERE name =?",
+                            (description, name))
+        self.connect.commit()
+
+    def add_photo(self, photo, name):
+        self.cursor.execute("UPDATE memes SET photo = ? WHERE name =?",
+                            (photo, name))
+
+    def get_photo(self, name):
+        result = self.cursor.execute("SELECT photo FROM memes WHERE name = ?", (name))
+        row = result.fetchone()
+        if row is None:
+            return False
+        else:
+            return row[0]
+
+    def get_description(self, name):
+        result = self.cursor.execute("SELECT description FROM memes WHERE name = ?", (name))
+        row = result.fetchone()
+        if row is None:
+            return False
+        else:
+            return row[0]
+
