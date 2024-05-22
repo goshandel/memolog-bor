@@ -175,3 +175,5 @@ class Memes_base:
         else:
             return row[0]
 
+# описание, выбрать мем, предложка
+
