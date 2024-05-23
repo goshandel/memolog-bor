@@ -7,7 +7,7 @@ import telebot as telebot
 from buttons import start_markup, get_meme, choice_month, year_list, month_list, choice_year
 from config import token
 from database import Users_base
-from info import start_text, help_info, help_from_users_info, read_meme_info, choice_info
+from info import start_text, help_info, help_from_users_info, read_meme_info, choice_info, choice_info_none
 
 bot = telebot.TeleBot(token=token)
 
@@ -57,29 +57,41 @@ def say_hello(message):
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "year")
 def choice_month_(callback):
-    bot.send_message(text=choice_info, chat_id=callback.message.chat.id, parse_mode='html', reply_markup=choice_year)
+    bot.edit_message_text(text=choice_info, chat_id=callback.message.chat.id,  parse_mode='html',
+                          message_id=callback.message.message_id, reply_markup=choice_year)
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "month")
 def choice_month_(callback):
-    bot.send_message(text=choice_info, chat_id=callback.message.chat.id, parse_mode='html', reply_markup=choice_month)
+    bot.edit_message_text(text=choice_info, chat_id=callback.message.chat.id,  parse_mode='html',
+                          message_id=callback.message.message_id, reply_markup=choice_month)
 
 @bot.callback_query_handler(func=lambda callback: callback.data in year_list)
 def choice_month_(callback):
     user_db = Users_base()
     user_db.add_year(callback.message.chat.id, callback.data)
     user_db.close()
-    bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
+    bot.edit_message_text(text=read_meme_info, chat_id=callback.message.chat.id, parse_mode='html',
+                          message_id=callback.message.message_id, reply_markup=get_meme)
 
 @bot.callback_query_handler(func=lambda callback: callback.data in month_list)
 def choice_month_(callback):
     user_db = Users_base()
     user_db.add_month(callback.message.chat.id, callback.data)
     user_db.close()
-    bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
+    bot.edit_message_text(text=read_meme_info, chat_id=callback.message.chat.id, parse_mode='html',
+                          message_id=callback.message.message_id, reply_markup=get_meme)
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "accept")
 def choice_month_(callback):
-    bot.edit_message_text(text="message_text_Lead", chat_id=callback.message.chat.id,  parse_mode='html', message_id=callback.message.message_id)
+    user_db = Users_base()
+    id = callback.message.chat.id
+    year_month = user_db.get_year_month(id)
+    if year_month == None:
+        bot.edit_message_text(text=choice_info_none, chat_id=callback.message.chat.id,  parse_mode='html',
+                              message_id=callback.message.message_id)
+        return
+    bot.edit_message_text(text="message_text_Lead", chat_id=callback.message.chat.id,  parse_mode='html',
+                          message_id=callback.message.message_id)
 
 
 bot.infinity_polling()

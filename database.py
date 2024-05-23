@@ -39,12 +39,13 @@ class Users_base:
     def get_year_month(self, id):
         self.cursor.execute("SELECT month, year FROM users WHERE id =?", (id,))
         results = self.cursor.fetchall()
-        formatted_results = [{"year": row[1], "month": row[0]} for row in results]
-        combined_results = []
-        for result in formatted_results:
-            combined_result = f"{result['year']}/{result['month']}"
-            combined_results.append(combined_result)
-        return combined_results
+        formatted_results = []
+        for row in results:
+            if row[0] is not None and row[1] is not None:
+                formatted_results.append(f"{row[1]}_{row[0]}")
+            else:
+                formatted_results.append(None)
+        return formatted_results
 
     def check_admin(self, id):
         self.cursor.execute("SELECT admin FROM users WHERE id =?", (id,))
