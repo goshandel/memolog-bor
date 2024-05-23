@@ -6,8 +6,9 @@ import telebot as telebot
 
 from buttons import start_markup, get_meme, choice_month, year_list, month_list, choice_year
 from config import token
-from database import Users_base
-from info import start_text, help_info, help_from_users_info, read_meme_info, choice_info, choice_info_none
+from database import Users_base, Years_base
+from info import start_text, help_info, help_from_users_info, read_meme_info, choice_info, \
+    choice_info_none_n1, choice_info_none_n2, memes_info
 
 bot = telebot.TeleBot(token=token)
 
@@ -68,7 +69,7 @@ def choice_month_(callback):
 @bot.callback_query_handler(func=lambda callback: callback.data in year_list)
 def choice_month_(callback):
     user_db = Users_base()
-    user_db.add_year(callback.message.chat.id, callback.data)
+    user_db.add_year(callback.message.chat.id, int(callback.data))
     user_db.close()
     bot.edit_message_text(text=read_meme_info, chat_id=callback.message.chat.id, parse_mode='html',
                           message_id=callback.message.message_id, reply_markup=get_meme)
@@ -76,7 +77,7 @@ def choice_month_(callback):
 @bot.callback_query_handler(func=lambda callback: callback.data in month_list)
 def choice_month_(callback):
     user_db = Users_base()
-    user_db.add_month(callback.message.chat.id, callback.data)
+    user_db.add_month(callback.message.chat.id, int(callback.data))
     user_db.close()
     bot.edit_message_text(text=read_meme_info, chat_id=callback.message.chat.id, parse_mode='html',
                           message_id=callback.message.message_id, reply_markup=get_meme)
@@ -86,12 +87,22 @@ def choice_month_(callback):
     user_db = Users_base()
     id = callback.message.chat.id
     year_month = user_db.get_year_month(id)
+    print(year_month)
+    user_db.close()
     if year_month == None:
-        bot.edit_message_text(text=choice_info_none, chat_id=callback.message.chat.id,  parse_mode='html',
+        bot.edit_message_text(text=choice_info_none_n1, chat_id=callback.message.chat.id,  parse_mode='html',
                               message_id=callback.message.message_id)
         return
-    bot.edit_message_text(text="message_text_Lead", chat_id=callback.message.chat.id,  parse_mode='html',
+    years_bd = Years_base()
+    if not years_bd.check_year_month(year_month):
+        bot.edit_message_text(text=choice_info_none_n2, chat_id=callback.message.chat.id,  parse_mode='html',
                           message_id=callback.message.message_id)
+
+        return
+    memes = years_bd.get_meme(year_month)
+    bot.edit_message_text(text=memes, chat_id=callback.message.chat.id,  parse_mode='html',
+                          message_id=callback.message.message_id)
+    bot.send_message(callback.message.chat.id, memes_info)
 
 
 bot.infinity_polling()

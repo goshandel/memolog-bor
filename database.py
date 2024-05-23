@@ -39,13 +39,12 @@ class Users_base:
     def get_year_month(self, id):
         self.cursor.execute("SELECT month, year FROM users WHERE id =?", (id,))
         results = self.cursor.fetchall()
-        formatted_results = []
-        for row in results:
-            if row[0] is not None and row[1] is not None:
-                formatted_results.append(f"{row[1]}_{row[0]}")
-            else:
-                formatted_results.append(None)
-        return formatted_results
+        if results and results[0][0] is not None and results[0][1] is not None:
+            year, month = results[0]
+            formatted_result = f"{year}{month}"
+            return formatted_result
+        else:
+            return None
 
     def check_admin(self, id):
         self.cursor.execute("SELECT admin FROM users WHERE id =?", (id,))
@@ -101,7 +100,7 @@ class Years_base:
         self.connect = sqlite3.connect('years.db')
         self.cursor = self.connect.cursor()
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS years 
-                        (year_month TEXT PRIMARY KEY AUTOINCREMENT,
+                        (year_month INTEGER PRIMARY KEY AUTOINCREMENT,
                         memes TEXT,
                         edit_meme TEXT)""")
         self.connect.commit()
@@ -110,6 +109,20 @@ class Years_base:
         self.cursor.execute("INSERT INTO years VALUES(?,?,?);",
                             (year_month, None, None))
         self.connect.commit()
+
+    def check_year_month(self, year_month):
+        self.cursor.execute("""SELECT year_month FROM years WHERE year_month = ?""", (year_month,))
+        data = self.cursor.fetchone()
+        return data is not None
+
+    def get_meme(self, year_month):
+        result = self.cursor.execute("SELECT memes FROM years WHERE year_month = ?", (year_month))
+        row = result.fetchone()
+        if row is None:
+            return False
+        else:
+            return row[0]
+
 
     def add_meme(self, year_month, meme):
         self.cursor.execute("UPDATE years SET memes = CONCAT(memes,?, '\n') WHERE year_month =?",
