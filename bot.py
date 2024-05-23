@@ -87,7 +87,6 @@ def choice_month_(callback):
     user_db = Users_base()
     id = callback.message.chat.id
     year_month = user_db.get_year_month(id)
-    print(year_month)
     user_db.close()
     if year_month == None:
         bot.edit_message_text(text=choice_info_none_n1, chat_id=callback.message.chat.id,  parse_mode='html',
