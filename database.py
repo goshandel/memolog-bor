@@ -192,7 +192,6 @@ class Memes_base:
     def get_photo(self, name):
         self.cursor.execute("SELECT photo FROM memes WHERE name = ?", (name,))
         row = self.cursor.fetchone()
-        print(row)
         if row is None:
             return False
         else:
@@ -201,7 +200,6 @@ class Memes_base:
     def get_description(self, name):
         self.cursor.execute("SELECT description FROM memes WHERE name = ?", (name,))
         row = self.cursor.fetchone()
-        print(row)
         if row is None:
             return False
         else:

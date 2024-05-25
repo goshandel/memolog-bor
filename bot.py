@@ -115,9 +115,7 @@ def get_description(message):
     user_db.close()
     memes_db = Memes_base()
     photo_base64 = memes_db.get_photo(message.text)
-    print(photo_base64)
     description = memes_db.get_description(message.text)
-    print(description)
     img = decode_base64_image(photo_base64)
     img.save("temp_image.jpg")
     bot.send_photo(chat_id=message.chat.id, photo=open("temp_image.jpg", "rb"), caption=description)
@@ -135,7 +133,6 @@ def add_new_meme(message):
 def add_name(message):
     name = message.text
     name_for_year = name + '\n'
-    print(name)
     memes_db = Memes_base()
     users_db = Users_base()
     year_month = users_db.get_year_month(message.chat.id)
@@ -155,9 +152,6 @@ def add_description(message):
     memes_db = Memes_base()
     users_db = Users_base()
     meme = users_db.get_meme(message.chat.id)
-    print(meme)
-    print(description)
-    print(str(description))
     memes_db.add_description(str(description), meme)
     users_db.close()
     memes_db.close()
@@ -171,12 +165,10 @@ def add_photo(message):
     with open(save_path, 'wb') as f:
         f.write(downloaded_file)
     base64_img = image_to_base64(save_path)
-    print(len(base64_img))
     if base64_img:
         memes_db = Memes_base()
         users_db = Users_base()
         meme = users_db.get_meme(message.chat.id)
-        print(meme)
         memes_db.add_photo(str(base64_img), meme)
         users_db.close()
         memes_db.close()
