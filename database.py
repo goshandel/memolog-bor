@@ -208,8 +208,6 @@ class Memes_base:
     def close(self):
         self.connect.close()
 
-# описание, выбрать мем, предложка
-
 def image_to_base64(image_path):
     img = Image.open(image_path)
     img_byte_arr = io.BytesIO()
@@ -220,9 +218,7 @@ def image_to_base64(image_path):
     return base64_str
 
 def string_to_base64(input_string):
-    # Преобразование строки в байтовую последовательность
     byte_arr = input_string.encode('utf-8')
-    # Кодирование байтовой последовательности в Base64
     base64_str = base64.b64encode(byte_arr).decode('utf-8')
     return base64_str
 

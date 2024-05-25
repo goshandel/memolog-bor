@@ -1,5 +1,6 @@
 import os
-
+from PIL import Image
+import io
 import telebot as telebot
 from buttons import start_markup, get_meme, choice_month, year_list, month_list, choice_year, add_meme1
 from config import token
@@ -161,6 +162,15 @@ def add_photo(message):
     photo = message.photo[-1]
     file_info = bot.get_file(photo.file_id)
     downloaded_file = bot.download_file(file_info.file_path)
+    try:
+        image = Image.open(io.BytesIO(downloaded_file))
+        width, height = image.size
+        if width != height:
+            bot.send_message(message.chat.id, "Изображение не является квадратом.")
+            return
+    except Exception as e:
+        bot.send_message(message.chat.id, "Произошла ошибка при открытии изображения.")
+        return
     save_path = 'photo.jpg'
     with open(save_path, 'wb') as f:
         f.write(downloaded_file)
