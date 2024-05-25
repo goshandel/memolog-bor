@@ -1,5 +1,5 @@
 import sqlite3
-
+import io
 
 class Users_base:
     def __init__(self):
@@ -91,6 +91,14 @@ class Users_base:
         results = self.cursor.fetchall()
         return results
 
+    def get_meme(self, id):
+        result = self.cursor.execute("SELECT meme FROM users WHERE id = ?", (id,))
+        row = result.fetchone()
+        if row is None:
+            return False
+        else:
+            return row[0]
+
     def close(self):
         self.connect.close()
 
@@ -106,8 +114,8 @@ class Years_base:
         self.connect.commit()
 
     def add_new_month(self, year_month):
-        self.cursor.execute("INSERT INTO years VALUES(?,?,?);",
-                            (year_month, None, None))
+        self.cursor.execute("INSERT INTO years (year_month, memes, edit_meme) VALUES (?, ?, ?)",
+                            (year_month, "", ""))
         self.connect.commit()
 
     def check_year_month(self, year_month):
@@ -116,18 +124,23 @@ class Years_base:
         return data is not None
 
     def get_meme(self, year_month):
-        result = self.cursor.execute("SELECT memes FROM years WHERE year_month = ?", (year_month))
+        result = self.cursor.execute("SELECT memes FROM years WHERE year_month = ?", (year_month,))
         row = result.fetchone()
         if row is None:
             return False
         else:
             return row[0]
 
-
     def add_meme(self, year_month, meme):
-        self.cursor.execute("UPDATE years SET memes = CONCAT(memes,?, '\n') WHERE year_month =?",
-                            (meme, year_month))
-        self.connect.commit()
+        result = self.cursor.execute("SELECT memes FROM years WHERE year_month =?", (year_month,))
+        row = result.fetchone()
+        if row is not None:
+            if isinstance(row[0], str):
+                new_memes = row[0] + '' + meme
+            else:
+                new_memes = str(row[0]) + '' + meme
+            self.cursor.execute("UPDATE years SET memes =? WHERE year_month =?", (new_memes, year_month))
+            self.connect.commit()
 
     def get_edit_meme(self, year_month):
         result = self.cursor.execute("SELECT edit_meme FROM years WHERE year_month = ?", (year_month))
@@ -148,20 +161,22 @@ class Years_base:
         else:
             return False
 
+    def close(self):
+        self.connect.close()
 
 class Memes_base:
     def __init__(self):
         self.connect = sqlite3.connect('memes.db')
         self.cursor = self.connect.cursor()
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS memes 
-                        (name TEXT PRIMARY KEY AUTOINCREMENT,
+                        (num INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT,
                         description TEXT,
                         photo TEXT)""")
         self.connect.commit()
 
     def add_new_meme(self, name):
-        self.cursor.execute("INSERT INTO memes VALUES(?,?,?);",
-                            (name, None, None))
+        self.cursor.execute("INSERT INTO memes (name, description, photo) VALUES (?,?,?)", (name, "", ""))
         self.connect.commit()
 
     def add_description(self, description, name):
@@ -170,24 +185,61 @@ class Memes_base:
         self.connect.commit()
 
     def add_photo(self, photo, name):
-        self.cursor.execute("UPDATE memes SET photo = ? WHERE name =?",
+        self.cursor.execute("UPDATE memes SET photo = ? WHERE name = ?",
                             (photo, name))
+        self.connect.commit()
 
     def get_photo(self, name):
-        result = self.cursor.execute("SELECT photo FROM memes WHERE name = ?", (name))
-        row = result.fetchone()
+        self.cursor.execute("SELECT photo FROM memes WHERE name = ?", (name,))
+        row = self.cursor.fetchone()
+        print(row)
         if row is None:
             return False
         else:
             return row[0]
 
     def get_description(self, name):
-        result = self.cursor.execute("SELECT description FROM memes WHERE name = ?", (name))
-        row = result.fetchone()
+        self.cursor.execute("SELECT description FROM memes WHERE name = ?", (name,))
+        row = self.cursor.fetchone()
+        print(row)
         if row is None:
             return False
         else:
             return row[0]
 
+    def close(self):
+        self.connect.close()
+
 # описание, выбрать мем, предложка
 
+def image_to_base64(image_path):
+    img = Image.open(image_path)
+    img_byte_arr = io.BytesIO()
+    img.save(img_byte_arr, format='PNG')
+    img_byte_arr = img_byte_arr.getvalue()
+    base64_str = base64.b64encode(img_byte_arr).decode('utf-8')
+
+    return base64_str
+
+def string_to_base64(input_string):
+    # Преобразование строки в байтовую последовательность
+    byte_arr = input_string.encode('utf-8')
+    # Кодирование байтовой последовательности в Base64
+    base64_str = base64.b64encode(byte_arr).decode('utf-8')
+    return base64_str
+
+
+import base64
+from PIL import Image
+from io import BytesIO
+
+
+def decode_base64_image(base64_string):
+    assert isinstance(base64_string, str), "base64_string must be a string"
+    if "data:image" in base64_string:
+        base64_string = base64_string.split(",")[1]
+    image_bytes = base64.b64decode(base64_string)
+    image_stream = BytesIO(image_bytes)
+    image = Image.open(image_stream)
+
+    return image

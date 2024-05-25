@@ -45,3 +45,7 @@ October  = InlineKeyboardButton("ОКТ", callback_data="10")
 November  = InlineKeyboardButton("НОЯ", callback_data="11")
 choice_month.add(December, January, February, March, April, May, June, July, August, September, October, November)
 month_list = ["12", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"]
+
+add_meme1 = InlineKeyboardMarkup(row_width=1)
+add_meme1.add(InlineKeyboardButton("год🎈", callback_data="year"),
+             InlineKeyboardButton("месяц🌝", callback_data="month"))
