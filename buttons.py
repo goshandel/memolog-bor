@@ -1,5 +1,4 @@
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
-from telebot import types
 start_markup = ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
 info = KeyboardButton("ГДЕ 🌎 Я")
 get_year_month = KeyboardButton("ВЫБРАТЬ МЕМ🔍")

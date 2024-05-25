@@ -2,7 +2,8 @@ import os
 from PIL import Image
 import io
 import telebot as telebot
-from buttons import start_markup, get_meme, choice_month, year_list, month_list, choice_year, add_meme1
+from buttons import start_markup, get_meme, choice_month, year_list, month_list, choice_year, add_meme1, \
+    choice_month_for_admin, choice_year_for_admin, year_list_for_admin, month_list_for_admin
 from config import token
 from database import Users_base, Years_base, Memes_base, image_to_base64, decode_base64_image
 from info import start_text, help_info, help_from_users_info, read_meme_info, choice_info, \
@@ -122,6 +123,34 @@ def get_description(message):
     bot.send_photo(chat_id=message.chat.id, photo=open("temp_image.jpg", "rb"), caption=description)
     os.remove("temp_image.jpg")
     memes_db.close()
+
+
+@bot.callback_query_handler(func=lambda callback: callback.data == "month_for_admin")
+def choice_month_(callback):
+    bot.edit_message_text(text=choice_info+"\n\nмодер", chat_id=callback.message.chat.id, parse_mode='html',
+                          message_id=callback.message.message_id, reply_markup=choice_month_for_admin)
+
+@bot.callback_query_handler(func=lambda callback: callback.data == "year_for_admin")
+def choice_year_(callback):
+    bot.edit_message_text(text=choice_info+"\n\nмодер", chat_id=callback.message.chat.id, parse_mode='html',
+                          message_id=callback.message.message_id, reply_markup=choice_year_for_admin)
+
+@bot.callback_query_handler(func=lambda callback: callback.data in year_list_for_admin)
+def choice_year__(callback):
+    user_db = Users_base()
+    user_db.add_year(callback.message.chat.id, int(callback.data))
+    user_db.close()
+    bot.edit_message_text(text="для начал выбери дату как только выберешь напиши название мема", chat_id=callback.message.chat.id, parse_mode='html',
+                          message_id=callback.message.message_id, reply_markup=add_meme1)
+
+@bot.callback_query_handler(func=lambda callback: callback.data in month_list_for_admin)
+def choice_month__(callback):
+    user_db = Users_base()
+    user_db.add_month(callback.message.chat.id, int(callback.data))
+    user_db.close()
+    bot.edit_message_text(text="для начал выбери дату как только выберешь напиши название мема", chat_id=callback.message.chat.id, parse_mode='html',
+                          message_id=callback.message.message_id, reply_markup=add_meme1)
+
 @bot.message_handler(commands=["new_meme"])
 def add_new_meme(message):
     users_db = Users_base()
@@ -203,6 +232,8 @@ def get_users(message):
         [f"{i + 1}. Айди: {value[0]}, Имя: {value[1]}, Никнейм: {value[2]}" for i, value in enumerate(first_three_values)])
     bot.send_message(message.chat.id, message_text)
     users_db.close()
+
+
 @bot.message_handler(commands=["new_admin"])
 def new_admin(message):
     users_db = Users_base()
@@ -225,6 +256,8 @@ def add_admin(message):
     except:
         bot.send_message(message.chat.id, "проверь айди")
     users_db.close()
+
+
 @bot.message_handler(commands=["get_council"])
 def return_council(message):
     users_db = Users_base()
@@ -236,6 +269,8 @@ def return_council(message):
     council = users_db.update_and_return_council()
     bot.send_message(message.chat.id, council)
     users_db.close()
+
+
 @bot.message_handler(commands=["help"])
 def return_council(message):
     users_db = Users_base()
