@@ -24,9 +24,10 @@ y_2015 = InlineKeyboardButton("2015", callback_data="2015")
 y_2014 = InlineKeyboardButton("2014", callback_data="2014")
 y_2013 = InlineKeyboardButton("2013", callback_data="2013")
 y_2012 = InlineKeyboardButton("2012", callback_data="2012")
-choice_year.add(y_2024, y_2023, y_2022, y_2021, y_2020)
-choice_year.add(y_2019, y_2018, y_2017)
-choice_year.add(y_2016, y_2015, y_2013, y_2012)
+#choice_year.add(y_2024, y_2023, y_2022, y_2021, y_2020)
+#choice_year.add(y_2019, y_2018, y_2017)
+#choice_year.add(y_2016, y_2015, y_2013, y_2012)
+choice_year.add(y_2024)
 year_list = ["2024", "2023", "2022", "2021", "2020", "2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012"]
 
 choice_month = InlineKeyboardMarkup(row_width=3)
@@ -42,7 +43,8 @@ August  = InlineKeyboardButton("АВГ", callback_data="08")
 September  = InlineKeyboardButton("СЕНТ", callback_data="09")
 October  = InlineKeyboardButton("ОКТ", callback_data="10")
 November  = InlineKeyboardButton("НОЯ", callback_data="11")
-choice_month.add(December, January, February, March, April, May, June, July, August, September, October, November)
+#choice_month.add(December, January, February, March, April, May, June, July, August, September, October, November)
+choice_month.add(April, May, June)
 month_list = ["12", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"]
 
 add_meme1 = InlineKeyboardMarkup(row_width=1)

@@ -120,7 +120,7 @@ def get_description(message):
     description = memes_db.get_description(message.text)
     img = decode_base64_image(photo_base64)
     img.save("temp_image.jpg")
-    bot.send_photo(chat_id=message.chat.id, photo=open("temp_image.jpg", "rb"), caption=description)
+    bot.send_photo(chat_id=message.chat.id, photo=open("temp_image.jpg", "rb"), caption=description, parse_mode='html', reply_markup=start_markup)
     os.remove("temp_image.jpg")
     memes_db.close()
 
@@ -278,5 +278,5 @@ def return_council(message):
         bot.send_message(message.chat.id, no_admin, parse_mode='html', reply_markup=start_markup)
         return
     users_db.close()
-    bot.send_message(message.chat.id, for_admin_list)
+    bot.send_message(message.chat.id, for_admin_list, parse_mode='html', reply_markup=start_markup)
 bot.infinity_polling()
